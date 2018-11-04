@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'apps.users.apps.UserConfig'
     #因为我们设置了 apps路径所以系统知道去哪里找,我们不用写apps
-    'users.apps.UserConfig',
+    'users.apps.UsersConfig',
     'rest_framework'
 ]
 
@@ -205,3 +205,9 @@ REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'utils.exception.exception_handler',
 }
+
+# 我们定义了我们自己的用户模型需要替换
+# 我们通过AUTH_USER_MODEL  告知系统用那个模型
+# 语法形式为: 子应用.模型类
+# 只能有一个点 '.'
+AUTH_USER_MODEL = 'users.User'
