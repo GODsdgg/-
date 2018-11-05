@@ -43,7 +43,7 @@ class RegisterUsernameCountView(APIView):
         count = User.objects.filter(username=username).count()
 
         #4.返回响应
-        return Response({'count':count})
+        return Response({'count':count,'username':username})
         pass
 
 
