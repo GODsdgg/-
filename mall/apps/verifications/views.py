@@ -41,5 +41,41 @@ class RegisterImageCodeView(APIView):
         # 4.返回响应
         return HttpResponse(image,content_type='image/jpeg')
 
+"""
+当用户点击 获取短信验证码的时候,前端应该将 手机号,图片验证码和uuid(image_code_id) 发送给后端
 
+1.接受前端数据
+2.校验数据
+3.先生成短信验证码
+4.发送短信
+5.返回响应
 
+GET           /verifications/sms_codes/mobile/uuid/text
+GET           /verifications/sms_codes/?mobile=xxxx&uuid=xxx&text=xxx
+GET          /verifications/sms_codes/?P<mobil>1[3-9]\d{9}/?uuid=xxx&text=xxx      选这个
+
+"""
+#APIView
+# GenericAPIView            列表,详情通用支持,一般和mixin配合使用
+# ListAPIView,RetrieveAPIView
+from . serializers import RegisterSmscodeSerializer
+class RegisterSmscodeView(APIView):
+
+    def get(self,request,mobile):
+        # 1.接受前端数据
+        params = request.query_params
+        # 2.校验数据 --- 放到了序列化器中
+        # text = params.get('text')
+        # image_code_id = params.get('dd')
+        #
+        # if not all(text,image_code_id):
+        # 校验
+        serializer = RegisterSmscodeSerializer(data=params)
+        #  调用is_valid 才会校验
+        serializer.is_valid(raise_exception=True)
+
+        # 3.先生成短信验证码
+        # 4.发送短信
+        # 5.返回响应
+
+        pass
