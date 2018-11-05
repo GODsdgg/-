@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
+from rest_framework.response import Response
 
 """
 一. 先把需求写下来(因为写下来很清晰,而且 一些东西不会遗忘)
@@ -59,6 +60,7 @@ GET          /verifications/sms_codes/?P<mobil>1[3-9]\d{9}/?uuid=xxx&text=xxx   
 # GenericAPIView            列表,详情通用支持,一般和mixin配合使用
 # ListAPIView,RetrieveAPIView
 from . serializers import RegisterSmscodeSerializer
+from libs.yuntongxun.sms import CCP
 class RegisterSmscodeView(APIView):
 
     def get(self,request,mobile):
@@ -75,7 +77,14 @@ class RegisterSmscodeView(APIView):
         serializer.is_valid(raise_exception=True)
 
         # 3.先生成短信验证码
-        # 4.发送短信
-        # 5.返回响应
+        from random import randint
+        sms_code = '%06d'%randint(0,999999)
+        # 4.保存短信 发送短信
+        redis_conn = get_redis_connection('code')
+        redis_conn.setex('sms_%s'%mobile,300,sms_code)
 
-        pass
+        CCP().send_template_sms(mobile,[sms_code,5],1)
+
+        # 5.返回响应
+        return Response({'msg':'ok'})
+
