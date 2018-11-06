@@ -6,7 +6,7 @@ from django_redis import get_redis_connection
 # 我们的数据没有模型,选择Serializer
 class RegisterSmscodeSerializer(serializers.Serializer):
 
-    test = serializers.CharField(label='图片验证码',min_length=4,max_length=4,required=True)
+    text = serializers.CharField(label='图片验证码',min_length=4,max_length=4,required=True)
     # UUID
     image_code_id = serializers.UUIDField(label='uuid',required=True)
 

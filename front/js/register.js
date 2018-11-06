@@ -28,6 +28,10 @@ var vm = new Vue({
     	this.generate_image_code();
 	},
 	methods: {
+		// 写在里边 第一次刷新的时候不会被调用
+		// mounted: function() {
+        // this.generate_image_code();
+		// },
 		 // 生成uuid
 		generate_uuid: function(){
 			var d = new Date().getTime();
@@ -57,7 +61,8 @@ var vm = new Vue({
 			} else {
 				this.error_name = false;
 			}
-			 // 检查重名
+
+			// 检查重名
             if (this.error_name == false) {
                 axios.get('http://127.0.0.1:8000'+'/users/usernames/' + this.username + '/count/', {
                         responseType: 'json'
@@ -81,14 +86,14 @@ var vm = new Vue({
 				this.error_password = true;
 			} else {
 				this.error_password = false;
-			}		
+			}
 		},
 		check_cpwd: function (){
 			if(this.password!=this.password2) {
 				this.error_check_password = true;
 			} else {
 				this.error_check_password = false;
-			}		
+			}
 		},
 		check_phone: function (){
 			var re = /^1[345789]\d{9}$/;
@@ -103,7 +108,7 @@ var vm = new Vue({
 				this.error_image_code = true;
 			} else {
 				this.error_image_code = false;
-			}	
+			}
 		},
 		check_sms_code: function(){
 			if(!this.sms_code){
@@ -127,8 +132,40 @@ var vm = new Vue({
 			this.check_phone();
 			this.check_sms_code();
 			this.check_allow();
+
+			 if(this.error_name == false && this.error_password == false && this.error_check_password == false
+                && this.error_phone == false && this.error_sms_code == false && this.error_allow == false) {
+                axios.post('http://127.0.0.1:8000'+'/users/', {
+                        username: this.username,
+                        password: this.password,
+                        password2: this.password2,
+                        mobile: this.mobile,
+                        sms_code: this.sms_code,
+                        allow: this.allow.toString()
+                    }, {
+                        responseType: 'json'
+                    })
+                    .then(response => {
+                        // 保存后端返回的token数据
+                        localStorage.token = response.data.token;
+                        localStorage.username = response.data.username;
+                        localStorage.user_id = response.data.id;
+
+                        location.href = '/index.html';
+                    })
+                    .catch(error=> {
+                        if (error.response.status == 400) {
+                            this.error_sms_code_message = '短信验证码错误';
+                            this.error_sms_code = true;
+                        } else {
+                            console.log(error.response.data);
+                        }
+                    })
+            }
+
 		},
-		 //发送短信验证码
+
+		//发送短信验证码
         send_sms_code: function () {
             if (this.sending_flag == true) {
                 return;

@@ -82,12 +82,13 @@ class RegisterSmscodeView(APIView):
         # 4.保存短信 发送短信
         redis_conn = get_redis_connection('code')
         redis_conn.setex('sms_%s'%mobile,300,sms_code)
+        print(sms_code)
 
         # CCP().send_template_sms(mobile,[sms_code,5],1)
         from celery_tasks.sms.tasks import send_sms_code
 
         # delay 的参数和 send_sms_code 任务的参数是对应的
-        send_sms_code.delay(mobile,sms_code )
+        send_sms_code.delay(mobile,sms_code)
 
         # 5.返回响应
         return Response({'msg':'ok'})
