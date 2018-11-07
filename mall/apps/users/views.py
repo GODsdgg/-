@@ -107,6 +107,16 @@ class RegisterCreateUserView(APIView):
         return Response(serializer.data)
 
 """
+
+一.断点
+ 	    在程序的入口出
+ 	    部分代码实现一个功能
+ 	    认为哪里有错误
+ 	    每行都加
+
+二.事件的触发点
+ 	    很好的确定代码写在哪里
+
 用户注册之后,直接跳转到首页,默认表示已经登录
 
 #注册完成应该 返回给客户端一个token

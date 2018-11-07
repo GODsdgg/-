@@ -252,3 +252,6 @@ JWT_AUTH = {
     # token的有效期
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
 }
+
+# AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
+AUTHENTICATION_BACKENDS = ['utils.users.MobileUsernameModelBackend']
