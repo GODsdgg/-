@@ -81,6 +81,7 @@ POST            users/
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.generics import CreateAPIView
 from .serializers import RegisterCreateUserSeaializer
+from rest_framework_jwt.utils import jwt_response_payload_handler
 class RegisterCreateUserView(APIView):
 
     def post(self,request):
