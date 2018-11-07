@@ -23,6 +23,7 @@ var vm = new Vue({
 		sms_code_tip: '获取短信验证码',
 		error_image_code_message: '请填写图片验证码',
 		error_sms_code_message: '请填写短信验证码',
+		error_phone_message: '您输入的手机号格式不正确',
 	},
 	mounted: function() {
     	this.generate_image_code();
@@ -54,6 +55,31 @@ var vm = new Vue({
 			// 设置页面中图片验证码img标签的src属性
 			this.image_code_url = 'http://127.0.0.1:8000' + "/verifications/imagecodes/" + this.image_code_id + "/";
 		},
+		check_phone: function (){
+            var re = /^1[345789]\d{9}$/;
+            if(re.test(this.mobile)) {
+                this.error_phone = false;
+            } else {
+                this.error_phone_message = '您输入的手机号格式不正确';
+                this.error_phone = true;
+            }
+            if (this.error_phone == false) {
+                axios.get('http://127.0.0.1:8000'+'/users/phones/'+ this.mobile + '/count/', {
+                        responseType: 'json'
+                    })
+                    .then(response => {
+                        if (response.data.count > 0) {
+                            this.error_phone_message = '手机号已存在';
+                            this.error_phone = true;
+                        } else {
+                            this.error_phone = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                    })
+            }
+        },
 		check_username: function (){
 			var len = this.username.length;
 			if(len<5||len>20) {
@@ -95,14 +121,7 @@ var vm = new Vue({
 				this.error_check_password = false;
 			}
 		},
-		check_phone: function (){
-			var re = /^1[345789]\d{9}$/;
-			if(re.test(this.mobile)) {
-				this.error_phone = false;
-			} else {
-				this.error_phone = true;
-			}
-		},
+
 		check_image_code: function (){
 			if(!this.image_code) {
 				this.error_image_code = true;

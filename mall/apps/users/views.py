@@ -44,7 +44,24 @@ class RegisterUsernameCountView(APIView):
 
         #4.返回响应
         return Response({'count':count,'username':username})
-        pass
+
+class RegisterPhoneCountAPIView(APIView):
+    """
+    查询手机号的个数
+    GET: /users/phones/(?P<mobile>1[345789]\d{9})/count/
+    """
+    def get(self,request,mobile):
+
+        #通过模型查询获取手机号个数
+        count = User.objects.filter(mobile=mobile).count()
+        #组织数据
+        context = {
+            'count':count,
+            'mobile':mobile
+        }
+
+        return Response(context)
+
 
 
 """
@@ -81,4 +98,7 @@ class RegisterCreateUserView(APIView):
         # 3.数据入库
         serializer.save()
         # 4.返回响应
+        # user -  序列化器->  字典
+        # serializer.data --- 将模型转换为字典的过程
+
         return Response(serializer.data)
