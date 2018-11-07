@@ -254,4 +254,5 @@ JWT_AUTH = {
 }
 
 # AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
-AUTHENTICATION_BACKENDS = ['utils.users.MobileUsernameModelBackend']
+# AUTHENTICATION_BACKENDS = ['utils.users.MobileUsernameModelBackend']
+AUTHENTICATION_BACKENDS = ['utils.users.SettingsBackend']
