@@ -101,5 +101,16 @@ class RegisterCreateUserView(APIView):
         # 4.返回响应
         # user -  序列化器->  字典
         # serializer.data --- 将模型转换为字典的过程
+        # 序列化器的 序列化(模型-->字典)操作原理是:
+        # 我们的序列化器 根据 字段来获取 模型的属性的值,来转换为字典
 
         return Response(serializer.data)
+
+"""
+用户注册之后,直接跳转到首页,默认表示已经登录
+
+#注册完成应该 返回给客户端一个token
+#1.如何生成token
+#2.在哪里返回
+
+"""

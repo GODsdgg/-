@@ -24,9 +24,13 @@ class RegisterCreateUserSeaializer(serializers.ModelSerializer):
     password2 = serializers.CharField(label='确认密码',write_only=True)
     allow = serializers.CharField(label='确认密码',write_only=True)
     # ModelSerializer 自动生成字段的时候 是根据 fields 列表生成的
+
+    # token = serializers.CharField(label='token',required=False)
+    token = serializers.CharField(label='token',read_only=True)
+
     class Meta:
         model = User
-        fields = ['username','password','mobile', 'sms_code', 'password2', 'allow']
+        fields = ['username','password','mobile', 'sms_code', 'password2', 'allow','token']
 
         extra_kwargs = {
             'username': {
@@ -121,4 +125,29 @@ class RegisterCreateUserSeaializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
 
+        # 生成token
+        from rest_framework_jwt.settings import api_settings
+
+        # 获取jwt的2个方法
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        # payload 可以装载数据(用户数据)
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+
+
+        user.token = token
+
+
         return user
+
+# class Person(object):
+# name = 'abc'
+#
+# p = Person()
+# p.name = 'itcast'
+# # 给对象动态添加属性
+#  p.age = 10
+# p2 = Person()
+# print(p2.age)
