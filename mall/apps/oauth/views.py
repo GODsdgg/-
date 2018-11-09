@@ -3,6 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 
+from oauth.utils import generic_access_token
+
 """
 1. 获取code
 2. 通过code换取token
@@ -50,7 +52,7 @@ GET     /oauth/qq/users/?code=xxx
 """
 from rest_framework import status
 from .models import OAuthQQUser
-
+from .serializers import OauthQQUserSerializer
 class OauthQQUserView(APIView):
 
     def get(self,request):
@@ -73,7 +75,15 @@ class OauthQQUserView(APIView):
             qquser = OAuthQQUser.objects.get(openid=openid)
         except OAuthQQUser.DoesNotExist:
             # 说明没有绑定过
-            return Response({'openid':openid})
+            """
+            1. 需要对敏感数据进行处理
+            2.数据还需要一个有效期
+            """
+
+            # 我们需要对 openid进行处理
+            openid = generic_access_token(openid)
+
+            return Response({'access_token':openid})
 
         else:
             # 说明存在, 用户已经绑定过来了,绑定过应该登录
@@ -94,5 +104,81 @@ class OauthQQUserView(APIView):
                 'token':token,
             })
 
+    """
+    用户点击绑定按钮的时候,前端应该将 手机号,密码,openid,sms_code 发送给后端
 
+    1. 接收数据
+    2. 对数据进行校验
+        2.1 校验 openid 和sms_code
+        2.2 判断手机号
+            如果注册过,需要判断 密码是否正确
+            如果没有注册过,创建用户
+    3. 保存数据
+        3.1保存 user 和 openid
+    4. 返回响应
+
+    POST
+    """
+
+    def post(self, request):
+
+        # 1. 接收数据
+        data = request.data
+        # 2. 对数据进行校验
+        # 2.1 校验 openid 和sms_code
+        # 2.2 判断手机号
+        # 如果注册过,需要判断 密码是否正确
+        # 如果没有注册过,创建用户
+        serializer = OauthQQUserSerializer(data = data)
+        serializer.is_valid(raise_exception=True)
+        # 3. 保存数据
+        serializer.save()
+
+        # 4. 返回响应
+
+        return Response()
+
+
+
+
+
+
+
+
+# 加密签名
+# from itsdangerous import JSONWebSignatureSerializer # 错误的
+
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
+
+from django.conf import settings
+# 1.创建 序列化器
+# secret_key             秘钥,一般使用工程的 SECRET_KEY
+# expires_in=None       有效期 单位秒
+serializer = Serializer(settings.SECRET_KEY, 3600)
+
+# 2. 组织 加密数据
+data = {'openid': '1234567890'}
+
+# 3.进行加密处理
+token = serializer.dumps(data)
+
+"""
+eyJpYXQiOjE1NDE2ODEwNjAsImV4cCI6MTU0MTY4NDY2MCwiYWxnIjoiSFMyNTYifQ.
+eyJvcGVuaWQiOiIxMjM0NTY3ODkwIn0.
+mIOKBa9hiOsiHS0sZUqo3hmFXyj2OZrYTt9f6Kk9FCE'
+
+"""
+# 4.对数据进行解密
+serializer.loads(token)
+
+#5.有效期
+serializer = Serializer(settings.SECRET_KEY,1)
+
+
+data = {'openid':'1234567890'}
+
+token = serializer.dumps(data)
+
+
+serializer.loads(token)
 
