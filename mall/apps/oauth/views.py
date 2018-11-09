@@ -25,7 +25,7 @@ from django.conf import settings
 class OauthQQURLView(APIView):
     def get(self,request):
 
-        state = 'test'
+        state = '/'
 
         # 1. 创建oauth对象
         # client_id=None, client_secret=None, redirect_uri=None, state=None
@@ -132,11 +132,22 @@ class OauthQQUserView(APIView):
         serializer = OauthQQUserSerializer(data = data)
         serializer.is_valid(raise_exception=True)
         # 3. 保存数据
-        serializer.save()
+        qquser = serializer.save()
 
         # 4. 返回响应
+        from  rest_framework_jwt.settings import api_settings
 
-        return Response()
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(qquser.user)
+        token = jwt_encode_handler(payload)
+
+        return Response({
+            'user_id': qquser.user.id,
+            'username': qquser.user.username,
+            'token': token,
+        })
 
 
 
