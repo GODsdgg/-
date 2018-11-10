@@ -151,3 +151,14 @@ class RegisterCreateUserSeaializer(serializers.ModelSerializer):
 #  p.age = 10
 # p2 = Person()
 # print(p2.age)
+
+
+
+
+# serializers.ModelSerializer
+# serializers.Serializer
+class UserCenterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'mobile', 'email')

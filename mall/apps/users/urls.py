@@ -12,6 +12,9 @@ urlpatterns = [
     # 定义url
     url(r'^auths/', obtain_jwt_token),
 
+    # /users/infos/
+    url(r'^infos/$',views.UserCenterView.as_view()),
+
 ]
 
 """
