@@ -15,6 +15,10 @@ urlpatterns = [
     # /users/infos/
     url(r'^infos/$',views.UserCenterView.as_view()),
 
+    url(r'^emails/$',views.UserEmailView.as_view()),
+
+
+
 ]
 
 """

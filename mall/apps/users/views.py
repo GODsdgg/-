@@ -170,3 +170,49 @@ class UserCenterView(RetrieveAPIView):
 
         # 获取某一个指定的对象
         return self.request.user
+
+
+
+"""
+用户在点击设置的时候,输入 邮箱信息, 当点击保存的时候 需要将邮箱信息发送给后端
+
+
+1. 这个接口必须是登录才可以访问
+2. 接收参数
+3. 验证数据
+4. 更新数据
+5. 发送激活邮件
+6. 返回响应
+
+PUT         /users/emails/
+"""
+# APIView
+# GenericAPIView                    列表,详情通用支持,一般和mixin配合使用
+# UpdateAPIView
+from .serializers import UserEmailSerializer
+from rest_framework.mixins import UpdateModelMixin
+
+
+class UserEmailView(APIView):
+
+    # 1. 这个接口必须是登录才可以访问
+    permission_classes = [IsAuthenticated]
+
+    def put(self,request):
+        # 2. 接收参数
+        data = request.data
+        # 3. 验证数据
+        user = request.user
+        serializer = UserEmailSerializer(instance=user,data=data)
+        serializer.is_valid(raise_exception=True)
+        # 4. 更新数据
+        serializer.save()
+        # 5. 发送激活邮件
+        # 6. 返回响应
+        return Response(serializer.data)
+
+
+
+
+
+
