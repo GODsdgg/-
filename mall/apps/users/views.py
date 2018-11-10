@@ -130,24 +130,43 @@ class RegisterCreateUserView(APIView):
 # ListAPIView,RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserCenterSerializer
-class UserCenterView(APIView):
+# class UserCenterView(APIView):
+#
+#     """
+#     登录用户访问个人中心的时候 ,我们需要将个人信息返回获取
+#
+#     1. 如何确定是登录用户  --> 需要前端传递一个token过来
+#     2. 获取用户信息
+#     3. 返回数据
+#
+#     GET     /users/infos/
+#     """
+#     # 权限
+#     # 1.登录用户访问权限
+#     permission_classes = [IsAuthenticated]
+#
+#     def get(self,request):
+#         # 2.获取用户信息
+#         user = request.user
+#         # 3.返回数据
+#         serializer = UserCenterSerializer(user)
+#         return Response(serializer.data)
 
-    """
-    登录用户访问个人中心的时候 ,我们需要将个人信息返回获取
 
-    1. 如何确定是登录用户  --> 需要前端传递一个token过来
-    2. 获取用户信息
-    3. 返回数据
 
-    GET     /users/infos/
-    """
+from rest_framework.mixins import RetrieveModelMixin
+
+from rest_framework.generics import RetrieveAPIView
+
+class UserCenterView(RetrieveAPIView):
+
+    serializer_class = UserCenterSerializer
+
+    queryset = User.objects.all()
     # 权限
-    # 1.登录用户访问权限
     permission_classes = [IsAuthenticated]
 
-    def get(self,request):
-        # 2.获取用户信息
-        user = request.user
-        # 3.返回数据
-        serializer = UserCenterSerializer(user)
-        return Response(serializer.data)
+    def get_object(self):
+
+        # 获取某一个指定的对象
+        return self.request.user
