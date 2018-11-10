@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from users.models import User
 # from apps.users.models import User    错误的
-
+from users.utlis import generic_active_url
 # apps.users  我们已经告诉系统 users 在哪里了,就不需要添加 apps
 
 """
@@ -214,16 +214,25 @@ class UserEmailView(APIView):
         # subject, 主题
         subject = '美多商城激活邮件'
         # message,     内容
-        message = '内容'
+        message = ''
         # from_email,  发件人
         from_email = settings.EMAIL_FROM
         # recipient_list, 接收人列表
         email = data.get('email')
         recipient_list = [email]
+        # 可以设置以下 html的样式等信息
+        verify_url = generic_active_url(user.id, email)
+
+        html_message = '<p>尊敬的用户您好！</p>' \
+                         '<p>感谢您使用美多商城。</p>' \
+                         '<p>您的邮箱为：%s 。请点击此链接激活您的邮箱：</p>' \
+                         '<p><a href="%s">%s<a></p>' % (email, verify_url, verify_url)
+
         send_mail(subject=subject,
                   message=message,
                   from_email=from_email,
-                  recipient_list=recipient_list
+                  recipient_list=recipient_list,
+                  html_message=html_message
                   )
         # 6. 返回响应
         return Response(serializer.data)
