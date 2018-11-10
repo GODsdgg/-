@@ -3,6 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 
+
 from users.models import User
 # from apps.users.models import User    错误的
 
@@ -191,7 +192,7 @@ PUT         /users/emails/
 # UpdateAPIView
 from .serializers import UserEmailSerializer
 from rest_framework.mixins import UpdateModelMixin
-
+from django.conf import settings
 
 class UserEmailView(APIView):
 
@@ -208,6 +209,22 @@ class UserEmailView(APIView):
         # 4. 更新数据
         serializer.save()
         # 5. 发送激活邮件
+        from django.core.mail import send_mail
+        # subject, message, from_email, recipient_list,
+        # subject, 主题
+        subject = '美多商城激活邮件'
+        # message,     内容
+        message = '内容'
+        # from_email,  发件人
+        from_email = settings.EMAIL_FROM
+        # recipient_list, 接收人列表
+        email = data.get('email')
+        recipient_list = [email]
+        send_mail(subject=subject,
+                  message=message,
+                  from_email=from_email,
+                  recipient_list=recipient_list
+                  )
         # 6. 返回响应
         return Response(serializer.data)
 
