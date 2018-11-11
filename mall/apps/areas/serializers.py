@@ -14,8 +14,8 @@ class AreaSubSerializer(serializers.ModelSerializer):
 
     # 这个是 市的序列化器
 
-    area_set = AreaSerailizer(many=True)
+    subs = AreaSerailizer(many=True)
 
     class Meta:
         model = Area
-        fields = ['area_set']
+        fields = ['id','name','subs']
