@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'oauth.apps.OauthConfig',
+    'areas.apps.AreasConfig',
 ]
 
 MIDDLEWARE = [
