@@ -168,3 +168,6 @@ class UserEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email',)
+
+
+    # def update(self, instance, validated_data):
