@@ -3,8 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 
-
-from users.models import User
+from users.models import User, Address
 # from apps.users.models import User    错误的
 from users.utlis import generic_active_url, get_active_user
 
@@ -26,44 +25,46 @@ GET           /users/usernames/(?P<username>\w{5,20})/count/
 
 
 """
-#APIView
+# APIView
 # GenericAPIView            列表,详情通用支持,一般和mixin配合使用
 # ListAPIView,RetrieveAPIView
 from rest_framework.views import APIView
+
 """
 1.前段传递过来的数据 已经在 url中校验过了
 2.我们也不需要 序列化器
 """
-class RegisterUsernameCountView(APIView):
 
-    def get(self,request,username):
-        #2.后端接受用户名
+
+class RegisterUsernameCountView(APIView):
+    def get(self, request, username):
+        # 2.后端接受用户名
         # username
-        #3.查询校验是否重复
-        #count = 0 表示没有注册
-        #count = 1 表示注册
+        # 3.查询校验是否重复
+        # count = 0 表示没有注册
+        # count = 1 表示注册
         count = User.objects.filter(username=username).count()
 
-        #4.返回响应
-        return Response({'count':count,'username':username})
+        # 4.返回响应
+        return Response({'count': count, 'username': username})
+
 
 class RegisterPhoneCountAPIView(APIView):
     """
     查询手机号的个数
     GET: /users/phones/(?P<mobile>1[345789]\d{9})/count/
     """
-    def get(self,request,mobile):
 
-        #通过模型查询获取手机号个数
+    def get(self, request, mobile):
+        # 通过模型查询获取手机号个数
         count = User.objects.filter(mobile=mobile).count()
-        #组织数据
+        # 组织数据
         context = {
-            'count':count,
-            'mobile':mobile
+            'count': count,
+            'mobile': mobile
         }
 
         return Response(context)
-
 
 
 """
@@ -77,16 +78,17 @@ class RegisterPhoneCountAPIView(APIView):
 POST            users/
 
 """
-#APIView
+# APIView
 # GenericAPIView            列表,详情通用支持,一般和mixin配合使用
 # ListAPIView,RetrieveAPIView
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 from .serializers import RegisterCreateUserSeaializer
 from rest_framework_jwt.utils import jwt_response_payload_handler
-class RegisterCreateUserView(APIView):
 
-    def post(self,request):
+
+class RegisterCreateUserView(APIView):
+    def post(self, request):
         # 1.接收前端提交的数据
         # username = request.form.get('username')
         # username = request.form.get('username')
@@ -108,6 +110,7 @@ class RegisterCreateUserView(APIView):
 
         return Response(serializer.data)
 
+
 """
 
 一.断点
@@ -127,7 +130,7 @@ class RegisterCreateUserView(APIView):
 
 """
 
-#APIView
+# APIView
 # GenericAPIView            列表,详情通用支持,一般和mixin配合使用
 # ListAPIView,RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -160,8 +163,8 @@ from rest_framework.mixins import RetrieveModelMixin
 
 from rest_framework.generics import RetrieveAPIView
 
-class UserCenterView(RetrieveAPIView):
 
+class UserCenterView(RetrieveAPIView):
     serializer_class = UserCenterSerializer
 
     queryset = User.objects.all()
@@ -169,10 +172,8 @@ class UserCenterView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-
         # 获取某一个指定的对象
         return self.request.user
-
 
 
 """
@@ -195,27 +196,26 @@ from .serializers import UserEmailSerializer
 from rest_framework.mixins import UpdateModelMixin
 from django.conf import settings
 
-class UserEmailView(APIView):
 
+class UserEmailView(APIView):
     # 1. 这个接口必须是登录才可以访问
     permission_classes = [IsAuthenticated]
 
-    def put(self,request):
+    def put(self, request):
         # 2. 接收参数
         data = request.data
         # 3. 验证数据
         user = request.user
-        serializer = UserEmailSerializer(instance=user,data=data)
+        serializer = UserEmailSerializer(instance=user, data=data)
         serializer.is_valid(raise_exception=True)
         # 4. 更新数据
         serializer.save()
-
 
         # Celery 可以理解为一个消息中心
 
         from celery_tasks.email.tasks import send_active_email
 
-        send_active_email.delay(data.get('email'),request.user.id)
+        send_active_email.delay(data.get('email'), request.user.id)
         # # 5. 发送激活邮件
         # from django.core.mail import send_mail
         # # subject, message, from_email, recipient_list,
@@ -246,7 +246,6 @@ class UserEmailView(APIView):
         return Response(serializer.data)
 
 
-
 # from rest_framework.generics import UpdateAPIView
 # class UpdataEmailView(UpdateAPIView):
 #
@@ -260,8 +259,9 @@ class UserEmailView(APIView):
 
 
 from rest_framework import status
-class UserActiveEmailView(APIView):
 
+
+class UserActiveEmailView(APIView):
     """
     当用户点击激活连接的时候,会跳转到一个页面,这个页面中含有 token(含有 用户id和email信息)信息
     前端需要发送一个ajax请求,将 token 发送给后端
@@ -272,7 +272,8 @@ class UserActiveEmailView(APIView):
 
     GET     /users/emails/verification/?token=xxx
     """
-    def get(self,request):
+
+    def get(self, request):
         # 1.接受token
         token = request.query_params.get('token')
         if token is None:
@@ -289,8 +290,7 @@ class UserActiveEmailView(APIView):
         user.save()
 
         # 3.返回响应
-        return Response({'msg':'ok'})
-
+        return Response({'msg': 'ok'})
 
 
 """
@@ -305,17 +305,57 @@ class UserActiveEmailView(APIView):
 
 POST    users/addresses/
 """
-from rest_framework.generics import CreateAPIView
-from .serializers import AddressSerializer
+from rest_framework.generics import  ListCreateAPIView,DestroyAPIView, UpdateAPIView
+from .serializers import AddressSerializer, Title
 
 from rest_framework.viewsets import GenericViewSet  # 笔记用的这个
 
 from rest_framework.generics import GenericAPIView
 
-class AddressCreateAPIView(CreateAPIView):
 
+class AddressCreateAPIView(ListCreateAPIView):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    # 显示列表
+    def get(self, request, *args, **kwargs):
+        # 响应
+        user = self.request.user
+
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({
+            'user_id': user.id,
+            'default_address_id': user.default_address_id,
+            'limit': 20,
+            'addresses': serializer.data,
+        })
+
+
+# 删除&修改
+class AddressModificationAPIView(DestroyAPIView,UpdateAPIView):
+
+    queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
 
+
+class AddressTitleAPIView(UpdateAPIView):
+
+    queryset = Address.objects.all()
+    serializer_class = Title
+
+
+class  AddressDefaultAPIView(APIView):
+
+
+    def put(self,request,id):
+        default = Address.objects.get(id=id)
+
+        user = self.request.user
+
+        user.default_address = default
+
+        user.save()
+
+        return Response({'message': 'OK'}, status=status.HTTP_200_OK)
 
 

@@ -198,10 +198,16 @@ class AddressSerializer(serializers.ModelSerializer):
 
         validated_data['user'] = self.context['request'].user
 
-        # return Address.objects.create(**validated_data)
+        return Address.objects.create(**validated_data)
 
         # super() 指向 单继承的 ModelSerializer
 
-        return super().create(validated_data)
+        # return super().create(validated_data)
 
+# 标题
+class  Title(serializers.ModelSerializer):
+
+    class Meta:
+        model = Address
+        fields = ('title',)
 

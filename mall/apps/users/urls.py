@@ -22,6 +22,14 @@ urlpatterns = [
 
     url(r'^addresses/$',views.AddressCreateAPIView.as_view()),
 
+    url(r'^addresses/(?P<pk>\d+)/$',views.AddressModificationAPIView.as_view()),
+
+    url(r'^addresses/(?P<pk>\d+)/title/$',views.AddressTitleAPIView.as_view()),
+
+    url(r'^addresses/(?P<id>\d+)/status/$',views.AddressDefaultAPIView.as_view()),
+
+
+
 ]
 
 """
