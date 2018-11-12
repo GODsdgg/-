@@ -337,13 +337,13 @@ class AddressModificationAPIView(DestroyAPIView,UpdateAPIView):
     serializer_class = AddressSerializer
 
 
-
+#修改标题
 class AddressTitleAPIView(UpdateAPIView):
 
     queryset = Address.objects.all()
     serializer_class = Title
 
-
+# 设置默认收货地址
 class  AddressDefaultAPIView(APIView):
 
 
