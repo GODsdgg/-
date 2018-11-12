@@ -20,7 +20,7 @@ urlpatterns = [
 
     url(r'^emails/verification/$', views.UserActiveEmailView.as_view()),
 
-
+    url(r'^addresses/$',views.AddressCreateAPIView.as_view()),
 
 ]
 

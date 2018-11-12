@@ -290,3 +290,32 @@ class UserActiveEmailView(APIView):
 
         # 3.返回响应
         return Response({'msg':'ok'})
+
+
+
+"""
+新增地址功能
+
+前端将用户提交的数据 传递给后端
+
+1.后端接受数据
+2.对数据进行校验
+3.数据入库
+4.返回响应
+
+POST    users/addresses/
+"""
+from rest_framework.generics import CreateAPIView
+from .serializers import AddressSerializer
+
+from rest_framework.viewsets import GenericViewSet  # 笔记用的这个
+
+from rest_framework.generics import GenericAPIView
+
+class AddressCreateAPIView(CreateAPIView):
+
+    serializer_class = AddressSerializer
+
+
+
+

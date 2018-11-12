@@ -54,8 +54,10 @@ areas/infos/pk/
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from .models import Area
 from .serializers import AreaSerailizer,AreaSubSerializer
+from rest_framework_extensions.cache.mixins import ListCacheResponseMixin,RetrieveCacheResponseMixin
+from rest_framework_extensions.cache.mixins import CacheResponseMixin
 
-class AreaViewSet(ReadOnlyModelViewSet):
+class AreaViewSet(CacheResponseMixin,ReadOnlyModelViewSet):
     # ReadOnlyModelViewSet 最终也是继承自 GenericAPIView
 
     # ReadOnlyModelViewSet
