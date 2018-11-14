@@ -68,7 +68,16 @@ INSTALLED_APPS = [
     'contents.apps.ContentsConfig',
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传图片模块
+    'django_crontab',  # 定时任务
 ]
+
+
+# 定时任务
+CRONJOBS = [
+    # 每5分钟执行一次生成主页静态文件
+    ('*/5 * * * *', 'contents.cron.generate_static_index_html', '>> /home/python/Desktop/Django15/meiduo_15/mall/logs/crontab.log')
+]
+
 
 MIDDLEWARE = [
     #必须放到第一位
